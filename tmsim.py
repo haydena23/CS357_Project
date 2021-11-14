@@ -2,7 +2,10 @@ import collections
 import itertools
 from termcolor import colored
 
+## TuringMachine class
 class TuringMachine:
+
+    # Default constructor to create initial state
     def __init__(
         self,
         initial_sequence=(),
@@ -11,36 +14,46 @@ class TuringMachine:
         initial_state='q_s',
         initial_head_position=0,
     ):
+        # Set self vars based off of intial state
         self.blank_symbol, self.state, self.head_position = blank_symbol, initial_state, initial_head_position
         self.tape = collections.defaultdict(lambda: self.blank_symbol, enumerate(initial_sequence))
 
+    # Function to return the current symbol at head_position
     @property
     def symbol(self):
         return self.tape[self.head_position]
 
+    # Function to set the new symbol to current head position
     @symbol.setter
     def symbol(self, new_symbol):
         self.tape[self.head_position] = new_symbol
 
+    # 
     @property
     def configuration(self):
-        indices = self.tape.keys()
-        left, right = (min(indices), max(indices)) if indices else (0, 0)
+        indices = self.tape.keys() # Split tape into array using keys in format [0,1,2..tapeMax]
+        left, right = (min(indices), max(indices)) if indices else (0, 0) # Set the lowest and highest index of input string
+        # Sets alpha as tape string
         alpha, beta = (
             tuple(self.tape[index] for index in range(*r))
             for r in ((left, self.head_position), (self.head_position, max(right, self.head_position)+1))
         )
         return alpha, self.state, beta
 
+    # Function to remove blanks from string, and create tape by concatenating all symbols on self.tape 
     @property
     def tape_contents(self):
         indices = self.tape.keys()
         left, right = (min(indices), max(indices)) if indices else (0, 0)
+
+        # Function to remove any blank symbols 
         def strip_blanks(iterable):
             return itertools.takewhile(
                 lambda symbol: symbol != self.blank_symbol,
                 itertools.dropwhile(lambda symbol: symbol == self.blank_symbol, iterable)
             )
+        
+        # Remove all blanks from symbols in tape, then concatenate all symbols from left edge to the right edge+1 to include one blank
         return ''.join(strip_blanks(self.tape[index] for index in range(left, right+1)))
 
     def step(self, transition_function):
@@ -53,7 +66,11 @@ class TuringMachine:
         # yield self.configuration # after symbol change but before head movement
         self.head_position = head_movement_func(self.head_position)
 
+
+## Algorithm class defining the input file
 class Algorithm:
+
+    # Create initial object for TM data
     def __init__(
         self,
         funcdict,
@@ -69,18 +86,22 @@ class Algorithm:
         empty_word_representation='ε',
         symbols_representations={'[]': '□'},
     ):
+        # Set init vars
         self.blank_symbol, self.initial_state = blank_symbol, initial_state
         self.empty_word_representation, self.symbols_representations = empty_word_representation, symbols_representations
 
-        states = set(funcdict.keys()).union(states)
-        symbols = set(symbol for values in funcdict.values() for symbol in values.keys()).union(symbols)
+        states = set(funcdict.keys()).union(states) # Create set of all states in TM
+        symbols = set(symbol for values in funcdict.values() for symbol in values.keys()).union(symbols) # Creates set of tape alphabet
 
+        # Check all combinations of states, symbols and arrows
         for (label1, set1), (label2, set2) in itertools.combinations({'states': states, 'symbols': symbols, 'arrows': arrows}.items(), 2):
             if not set1.isdisjoint(set2):
                 raise ValueError(f'Sets of {label1} and {label2} are not disjoint')
 
-        self.states_max_length = max(len(str(state)) for state in states)
 
+        self.states_max_length = max(len(str(state)) for state in states) # Calculates the largest string of all state names as int
+
+        # Function to parse information for each transition
         def parse_value(old_state, old_symbol, value):
             if not isinstance(value, tuple):
                 value = (value,)
@@ -112,15 +133,17 @@ class Algorithm:
             return self.empty_word_representation
         return ''.join((str(self.symbols_representations.get(symbol, symbol)) for symbol in sequence))
 
+    # Function to define how to format the output of the program
     def format_configuration(self, configuration):
         alpha, state, (symbol, *beta) = configuration
         return ''.join((
-            colored(f'<{state}>'.ljust(self.states_max_length+5), attrs=['dark']),
-            self.format_sequence(alpha, replace_empty_word=False),
-            colored(self.format_sequence((symbol,)), attrs=['underline']),
-            self.format_sequence(beta, replace_empty_word=False)
+            colored(f'<{state}>'.ljust(self.states_max_length+5)), # Display current state, then buffer of max state string length+OFFSET
+            self.format_sequence(alpha, replace_empty_word=False), # Display left side of current head
+            colored(self.format_sequence((symbol,)), attrs=['underline']), # Underline current head position
+            self.format_sequence(beta, replace_empty_word=False) # Display right side of current head
         ))
 
+    ## Run function
     def run(
         self,
         initial_sequence,
@@ -133,28 +156,20 @@ class Algorithm:
         },
         step_limit=1_000_000,
         raise_on_exceed=True,
-        print_configurations=True,
     ):
+
         tm = TuringMachine(initial_sequence, blank_symbol=self.blank_symbol, initial_state=self.initial_state)
-        if print_configurations:
-            print(self.format_configuration(tm.configuration))
-        for step in itertools.count():
+        print(self.format_configuration(tm.configuration)) # Print the initial configuration
+        for step in itertools.count(): # Step through the turing machine
             tm.step(self.transition_function)
-            if print_configurations:
-                print(self.format_configuration(tm.configuration))
+            print(self.format_configuration(tm.configuration))
 
             if tm.state in final_states:
                 return final_states[tm.state], tm.tape_contents
 
+            # Set step count to ensure that we don't get into an infinite loop
             if step_limit is not None and step > step_limit:
                 if raise_on_exceed:
                     raise RuntimeError(f'Step limit of {step_limit} exceeded')
                 else:
                     return None
-
-def generate_words(symbols, maxlength, minlength=0):
-    return (
-        ''.join(seq)
-        for length in range(minlength, maxlength+1)
-        for seq in itertools.product(symbols, repeat=length)
-    )
