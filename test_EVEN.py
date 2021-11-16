@@ -11,4 +11,4 @@ Algorithm({
         '1': ('q_even', '->'),
         '[]': False,
     }
-}, initial_state='q_even').run('111000')
+}, initial_state='q_even').run('111111000000')
