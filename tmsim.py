@@ -104,23 +104,24 @@ class Algorithm:
         # Function to parse information for each transition
         def parse_value(old_state, old_symbol, value):
             if not isinstance(value, tuple):
-                value = (value,)
+                value = (value,) # If value isn't a tuple, set it to a tuple
 
             new_symbol, new_state, new_arrow = None, None, None
-            for v in value:
-                if v in arrows:
-                    new_arrow = v
-                elif v in states:
-                    new_state = v
-                elif v in symbols:
-                    new_symbol = v
+            for K in value: # Depending on what temp var K is, store it in respective var
+                if K in arrows:
+                    new_arrow = K
+                elif K in states:
+                    new_state = K
+                elif K in symbols:
+                    new_symbol = K
                 else:
-                    raise ValueError(f'Invalid transition function value {v} for state {old_state} and symbol {old_symbol}')
+                    raise ValueError(f'Incorrect transition function value {K} for state {old_state} and symbol {old_symbol}') # If not a valid transition, error
 
+            # Set new values from parsed data, then return values
             symbol = new_symbol if new_symbol is not None else old_symbol
             state = new_state if new_state is not None else old_state
-            head_movement_func = arrows[new_arrow] if new_arrow else lambda x: x
-            return symbol, state, head_movement_func
+            head_movement_function = arrows[new_arrow] if new_arrow else lambda x: x
+            return symbol, state, head_movement_function
 
         self.transition_function = {
             (state, symbol): parse_value(state, symbol, value)
@@ -143,7 +144,7 @@ class Algorithm:
             self.format_sequence(beta, replace_empty_word=False) # Display right side of current head
         ))
 
-    ## Run function
+    ## Definition of run to
     def run(
         self,
         initial_sequence,
@@ -154,22 +155,25 @@ class Algorithm:
             'q_y': True,
             'q_n': False
         },
-        step_limit=1_000_000,
+        run_limit=1_000,
         raise_on_exceed=True,
     ):
+
+        # Below is the main driver of the code
 
         tm = TuringMachine(initial_sequence, blank_symbol=self.blank_symbol, initial_state=self.initial_state)
         print(self.format_configuration(tm.configuration)) # Print the initial configuration
         for step in itertools.count(): # Step through the turing machine
-            tm.step(self.transition_function)
-            print(self.format_configuration(tm.configuration))
+            tm.step(self.transition_function) # Call step function
+            print(self.format_configuration(tm.configuration)) # Print the configuration
 
+            # If we are in the final state, return the final state and tape contents and end program
             if tm.state in final_states:
                 return final_states[tm.state], tm.tape_contents
 
-            # Set step count to ensure that we don't get into an infinite loop
-            if step_limit is not None and step > step_limit:
+            # Set step count to ensure that we don't get into an infinite loop or a TM that takes way too long
+            if run_limit is not None and step > run_limit:
                 if raise_on_exceed:
-                    raise RuntimeError(f'Step limit of {step_limit} exceeded')
+                    raise RuntimeError(f'Step limit of {run_limit} exceeded')
                 else:
                     return None
