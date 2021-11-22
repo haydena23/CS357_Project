@@ -57,7 +57,7 @@ class TuringMachine:
 
     # Function to remove blanks from string, and create tape by concatenating all symbols on self.tape 
     @property
-    def tape_contents(self):
+    def contents(self):
         indices = self.tape.keys() # Parse the index values from the tape
         left, right = (min(indices), max(indices)) if indices else (0, 0) # Calculate bounds of the tape
 
@@ -75,7 +75,7 @@ class TuringMachine:
         try:
             new_symbol, new_state, head_movement_func = transition_function[self.state, self.symbol]
         except KeyError:
-            raise RuntimeError(f'That transition is not defined')
+            raise RuntimeError(f'That transition is not defined for state {self.state}')
 
-        self.head_position = head_movement_func(self.head_position)
         self.symbol, self.state = new_symbol, new_state
+        self.head_position = head_movement_func(self.head_position)

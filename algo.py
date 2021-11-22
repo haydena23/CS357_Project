@@ -4,25 +4,27 @@ from termcolor import colored
 ## Algorithm class defining the input file
 class Algorithm:
 
+    #############################################################################
+    #############################################################################
+
     # Create initial object for TM data
     def __init__(
         self,
         funcdict,
         *,
-        blank_symbol='[]',
-        initial_state='q_s',
+        blank='[]',
+        starter_state='q_s',
         states=(True, False),
         symbols=(),
         arrows={
             '<-': lambda x: x-1,
             '->': lambda x: x+1,
         },
-        empty_word_representation='ε',
-        symbols_representations={'[]': '□'},
+        rename={'[]': '□'},
     ):
         # Set init vars
-        self.blank_symbol, self.initial_state = blank_symbol, initial_state
-        self.empty_word_representation, self.symbols_representations = empty_word_representation, symbols_representations
+        self.blank_symbol, self.initial_state = blank, starter_state
+        self.symbols_representations = rename
 
         states = set(funcdict.keys()).union(states) # Create set of all states in TM
         symbols = set(symbol for values in funcdict.values() for symbol in values.keys()).union(symbols) # Creates set of tape alphabet
@@ -32,8 +34,10 @@ class Algorithm:
             if not set1.isdisjoint(set2):
                 raise ValueError(f'Sets of {label1} and {label2} are not disjoint')
 
-
         self.states_max_length = max(len(str(state)) for state in states) # Calculates the largest string of all state names as int
+
+        #############################################################################
+        #############################################################################
 
         # Function to parse information for each transition
         def parse(old_state, old_symbol, value):
@@ -49,7 +53,7 @@ class Algorithm:
                 elif K in symbols:
                     new_symbol = K
                 else:
-                    raise ValueError(f'Not a valid transition') # If not a valid transition, error
+                    raise ValueError(f'Not a valid transition in the state') # If not a valid transition, error
 
             # Set new values from parsed data, then return values
             symbol = new_symbol if new_symbol is not None else old_symbol
@@ -57,57 +61,64 @@ class Algorithm:
             head_movement_function = arrows[new_arrow] if new_arrow else lambda x: x
             return symbol, state, head_movement_function
 
+        #############################################################################
+        #############################################################################
+
+        # Function to parse a single transition
         self.transition_function = {
-            (state, symbol): parse(state, symbol, value)
-            for state, symbols_to_values in funcdict.items()
-            for symbol, value in symbols_to_values.items()
+            (state, symbol): parse(state, symbol, value) for state, symbols_to_values in funcdict.items() for symbol, value in symbols_to_values.items()
         }
 
-    def form_seq(self, sequence, *, replace_empty_word=True):
-        if not sequence and replace_empty_word and self.empty_word_representation is not None:
-            return self.empty_word_representation
+        #############################################################################
+        #############################################################################
+
+    
+    def create_section(self, sequence):
         return ''.join((str(self.symbols_representations.get(symbol, symbol)) for symbol in sequence))
 
+    #############################################################################
+    #############################################################################
+
     # Function to define how to format the output of the program
-    def format_configuration(self, configuration):
+    def create_config(self, configuration):
         leftHead, state, (symbol, *rightHead) = configuration
         return ''.join((
             f'({state})'.ljust(self.states_max_length+5), # Display current state, then buffer of max state string length+OFFSET
-            self.form_seq(leftHead, replace_empty_word=False), # Display left side of current head
-            colored(self.form_seq((symbol,)), attrs=['underline']), # Underline current head position
-            self.form_seq(rightHead, replace_empty_word=False) # Display right side of current head
+            self.create_section(leftHead), # Display left side of current head
+            colored(self.create_section((symbol,)), attrs=['underline']), # Underline current head position
+            self.create_section(rightHead) # Display right side of current head
         ))
+
+    #############################################################################
+    #############################################################################
 
     ## Definition of run to execute the program
     def run(
         self,
-        initial_sequence,
+        starter,
         *,
-        final_states={
+        fstates={
             True: True,
             False: False,
-            'q_y': True,
-            'q_n': False
         },
-        run_limit=1_000,
-        raise_on_exceed=True,
+        max_steps=1_000,
     ):
 
         # Below is the main driver of the code
-
-        tm = TuringMachine(initial_sequence, blank_symbol=self.blank_symbol, initial_state=self.initial_state)
-        print(self.format_configuration(tm.configuration)) # Print the initial configuration
-        for step in itertools.count(): # Step through the turing machine
+        tm = TuringMachine(starter, blank_symbol=self.blank_symbol, initial_state=self.initial_state)
+        print(self.create_config(tm.configuration)) # Print the initial configuration
+       
+        for nextCounter in itertools.count(): # Step through the turing machine
             tm.next(self.transition_function) # Call step function
-            print(self.format_configuration(tm.configuration)) # Print the configuration
+            print(self.create_config(tm.configuration)) # Print the configuration
 
             # If we are in the final state, return the final state and tape contents and end program
-            if tm.state in final_states:
-                return final_states[tm.state], tm.tape_contents
+            if tm.state in fstates:
+                return fstates[tm.state], tm.contents
 
             # Set step count to ensure that we don't get into an infinite loop or a TM that takes way too long
-            if run_limit is not None and step > run_limit:
-                if raise_on_exceed:
-                    raise RuntimeError(f'Step limit of {run_limit} exceeded')
-                else:
-                    return None
+            if nextCounter > max_steps:
+                raise RuntimeError(f'Error: Step limit reached')
+    
+    #############################################################################
+    #############################################################################
