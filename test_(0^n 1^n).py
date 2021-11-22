@@ -1,6 +1,7 @@
 # { 0^n 1^n | n >= 0 }
 
 from tmsim import *
+from algo import *
 
 Algorithm({
     'q_s': {
@@ -26,4 +27,4 @@ Algorithm({
         '1': False,
         '[]': True,
     }
-}).run('001')
+}).run('00001111')

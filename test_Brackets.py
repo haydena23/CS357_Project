@@ -1,4 +1,5 @@
 from tmsim import *
+from algo import *
 import sys
 
 Algorithm({
