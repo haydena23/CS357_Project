@@ -17,19 +17,9 @@
 import collections
 import itertools
 
-# TuringMachine class
 class TuringMachine:
-
     # Default constructor to create initial state
-    def __init__(
-        self,
-        initial_sequence=(),
-        *,
-        blank_symbol='[]',
-        initial_state='q_s',
-        initial_head_position=0,
-    ):
-
+    def __init__(self, initial_sequence=(),*,blank_symbol='[]',initial_state='q_s',initial_head_position=0,):
         self.blank_symbol, self.state, self.head_position = blank_symbol, initial_state, initial_head_position # Sets self vars in accordance to initial vars
         self.tape = collections.defaultdict(lambda: self.blank_symbol, enumerate(initial_sequence)) # Creates tape by inserting blank space at the beginning, then the input string
 
@@ -48,11 +38,9 @@ class TuringMachine:
     def configuration(self):
         indices = self.tape.keys() # Split tape into array using keys in format [0,1,2..tapeMax]
         left, right = (min(indices), max(indices)) if indices else (0, 0) # Set the lowest and highest index of input string
-
         leftHead, rightHead = (
             tuple(self.tape[index] for index in range(*r)) for r in ((left, self.head_position), (self.head_position, max(right, self.head_position)+1))
         )
-
         return leftHead, self.state, rightHead
 
     # Function to remove blanks from string, and create tape by concatenating all symbols on self.tape 
@@ -60,14 +48,12 @@ class TuringMachine:
     def contents(self):
         indices = self.tape.keys() # Parse the index values from the tape
         left, right = (min(indices), max(indices)) if indices else (0, 0) # Calculate bounds of the tape
-
         # Function to remove any blank symbols 
         def remove_nulls(iterable):
             return itertools.takewhile(
                 lambda symbol: symbol != self.blank_symbol, # If symbol == blank symbol, break loop and return iterable without blank symbols
                 itertools.dropwhile(lambda symbol: symbol == self.blank_symbol, iterable) # If symbol == blank symbol, drop it and return
             )
-        
         # Concatenate the tape iterable that now doesn't include blank symbols
         return ''.join(remove_nulls(self.tape[index] for index in range(left, right+1)))
 
