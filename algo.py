@@ -98,7 +98,7 @@ class Algorithm:
         tm = TuringMachine(initial_sequence, blank_symbol=self.blank_symbol, initial_state=self.initial_state)
         print(self.format_configuration(tm.configuration)) # Print the initial configuration
         for step in itertools.count(): # Step through the turing machine
-            tm.step(self.transition_function) # Call step function
+            tm.next(self.transition_function) # Call step function
             print(self.format_configuration(tm.configuration)) # Print the configuration
 
             # If we are in the final state, return the final state and tape contents and end program

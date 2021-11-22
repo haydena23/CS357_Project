@@ -16,9 +16,8 @@
 
 import collections
 import itertools
-# from termcolor import colored # Module used to underline 
 
-## TuringMachine class
+# TuringMachine class
 class TuringMachine:
 
     # Default constructor to create initial state
@@ -51,8 +50,7 @@ class TuringMachine:
         left, right = (min(indices), max(indices)) if indices else (0, 0) # Set the lowest and highest index of input string
 
         leftHead, rightHead = (
-            tuple(self.tape[index] for index in range(*r))
-            for r in ((left, self.head_position), (self.head_position, max(right, self.head_position)+1))
+            tuple(self.tape[index] for index in range(*r)) for r in ((left, self.head_position), (self.head_position, max(right, self.head_position)+1))
         )
 
         return leftHead, self.state, rightHead
@@ -73,11 +71,11 @@ class TuringMachine:
         # Concatenate the tape iterable that now doesn't include blank symbols
         return ''.join(remove_nulls(self.tape[index] for index in range(left, right+1)))
 
-    def step(self, transition_function):
+    def next(self, transition_function):
         try:
             new_symbol, new_state, head_movement_func = transition_function[self.state, self.symbol]
         except KeyError:
             raise RuntimeError(f'That transition is not defined')
 
-        self.symbol, self.state = new_symbol, new_state
         self.head_position = head_movement_func(self.head_position)
+        self.symbol, self.state = new_symbol, new_state
