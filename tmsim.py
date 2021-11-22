@@ -1,6 +1,18 @@
+# Using Python 3.9
+# Authors:
+#   Tony Hayden
+#   Jennifer Brana
+# Version: 1.0
+# 11/22/21
+#
+# Notes:
+#   This program requires the termcolor module. To import this module, go to the terminal of this file
+#   and type "python -m pip install termcolor" without the "", and then restart. That should install the
+#   module. This module is being used to underline the head pointer on the tape.
+
 import collections
 import itertools
-from termcolor import colored
+from termcolor import colored # 
 
 ## TuringMachine class
 class TuringMachine:
@@ -144,7 +156,7 @@ class Algorithm:
             self.format_sequence(beta, replace_empty_word=False) # Display right side of current head
         ))
 
-    ## Definition of run to
+    ## Definition of run to execute the program
     def run(
         self,
         initial_sequence,
