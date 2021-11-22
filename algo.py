@@ -42,16 +42,20 @@ class Algorithm:
         # Function to parse information for each transition
         def parse(old_state, old_symbol, value):
             if not isinstance(value, tuple):
-                value = (value,) # If value isn't a tuple, set it to a tuple
+                value = (value,) # If value isn't a tuple var, set it to a tuple
 
             new_symbol, new_state, new_arrow = None, None, None
-            for K in value: # Depending on what temp var K is, store it in respective var
-                if K in arrows:
-                    new_arrow = K
-                elif K in states:
-                    new_state = K
-                elif K in symbols:
-                    new_symbol = K
+            
+            for decider in value: # Depending on what temp var decider is, store it in respective var
+                if decider in arrows:
+                    new_arrow = decider
+
+                elif decider in states:
+                    new_state = decider
+
+                elif decider in symbols:
+                    new_symbol = decider
+
                 else:
                     raise ValueError(f'Not a valid transition in the state') # If not a valid transition, error
 
@@ -80,8 +84,8 @@ class Algorithm:
     #############################################################################
 
     # Function to define how to format the output of the program
-    def create_config(self, configuration):
-        leftHead, state, (symbol, *rightHead) = configuration
+    def create_config(self, configuration): # Takes in self and configuration as a tuple
+        leftHead, state, (symbol, *rightHead) = configuration # Sets vars based off of configuration tuple
         return ''.join((
             f'({state})'.ljust(self.states_max_length+5), # Display current state, then buffer of max state string length+OFFSET
             self.create_section(leftHead), # Display left side of current head
@@ -98,23 +102,25 @@ class Algorithm:
         starter,
         *,
         fstates={
-            True: True,
-            False: False,
+            True: True, # If a state is true, mark it true. This is simulating an always accepting state
+            False: False, # If a state is false, mark it false. This is simulating an always rejecting state
         },
         max_steps=1_000,
     ):
 
         # Below is the main driver of the code
         tm = TuringMachine(starter, blank_symbol=self.blank_symbol, initial_state=self.initial_state)
+        print("\nTuring machine configurations")
+        print("=============================\n")
         print(self.create_config(tm.configuration)) # Print the initial configuration
-       
-        for nextCounter in itertools.count(): # Step through the turing machine
-            tm.next(self.transition_function) # Call step function
+    
+        for nextCounter in itertools.count(): # Step through the turing machine until max_steps is reached
+            tm.next(self.transition_function) # Call next transition function
             print(self.create_config(tm.configuration)) # Print the configuration
-
-            # If we are in the final state, return the final state and tape contents and end program
+            
+            # Check to see if we are in the final state, return the final state and tape contents and end program
             if tm.state in fstates:
-                return fstates[tm.state], tm.contents
+                return fstates[tm.state], tm.contents # If so, return the final state and the current tape
 
             # Set step count to ensure that we don't get into an infinite loop or a TM that takes way too long
             if nextCounter > max_steps:
