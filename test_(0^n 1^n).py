@@ -1,10 +1,8 @@
-# { 0^n 1^n | n >= 0 }
-
 from TuringMachine import *
 from algo import *
 
 Algorithm({
-    'q_s': {
+    'q_START': {
         '[]': True,
         '0': ('#', 'q_1', '->'),
         '1': False,

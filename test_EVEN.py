@@ -1,4 +1,5 @@
-from tmsim import *
+from TuringMachine import *
+from algo import *
 
 Algorithm({
     'q_even': {
