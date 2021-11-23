@@ -9,7 +9,7 @@ class Algorithm:
         function,
         *,
         blankChar='[]',
-        startState='q_s',
+        startState='q_START',
         states=(True, False),
         chars=(),
         arrows={'<-': lambda marker: marker-1,'->': lambda marker: marker+1,},

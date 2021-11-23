@@ -24,7 +24,7 @@ class TuringMachine:
         startTape=(),
         *,
         blankChar='[]',
-        startState='q_s',
+        startState='q_START',
         marker=0,):
         # Sets self vars in accordance to initial vars
         self.blankChar, self.state, self.marker = blankChar, startState, marker
