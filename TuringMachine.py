@@ -27,7 +27,9 @@ class TuringMachine:
         startState='q_START',
         marker=0,):
         # Sets self vars in accordance to initial vars
-        self.blankChar, self.state, self.marker = blankChar, startState, marker
+        self.blankChar = blankChar
+        self.state = startState
+        self.marker = marker
         # Creates tape by inserting blank space at the beginning, then the input string
         self.tape = collections.defaultdict(lambda: self.blankChar, enumerate(startTape)) 
     # Function to return the current char at head_position
@@ -62,8 +64,9 @@ class TuringMachine:
         return ''.join(remove_nulls(self.tape[idx] for idx in range(leftBound,rightBound+1)))
     def next(self, transition):
         try:
-            NEWchar, NEWstate, markerMove = transition[self.state,self.char]
+            NewChar, NewState, markerMove = transition[self.state,self.char]
         except KeyError:
             raise RuntimeError(f'That transition is not defined')
-        self.char, self.state = NEWchar, NEWstate
+        self.char = NewChar
+        self.state = NewState
         self.marker = markerMove(self.marker)

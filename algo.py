@@ -16,7 +16,8 @@ class Algorithm:
         rename={'[]': '$'},
         ):
         # Set init vars
-        self.blankChar, self.startState = blankChar, startState
+        self.blankChar = blankChar
+        self.startState = startState
         self.rename = rename
         states = set(function.keys()).union(states) # Create set of all states in TM
         chars = set(char for values in function.values() for char in values.keys()).union(chars) # Creates set of tape alphabet
