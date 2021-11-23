@@ -8,15 +8,15 @@ class Algorithm:
         self,
         function,
         *,
-        blank='[]',
+        blankChar='[]',
         startState='q_s',
         states=(True, False),
         chars=(),
         arrows={'<-': lambda marker: marker-1,'->': lambda marker: marker+1,},
-        rename={'[]': '⬚'},
+        rename={'[]': '$'},
         ):
         # Set init vars
-        self.blank, self.startState = blank, startState
+        self.blankChar, self.startState = blankChar, startState
         self.rename = rename
         states = set(function.keys()).union(states) # Create set of all states in TM
         chars = set(char for values in function.values() for char in values.keys()).union(chars) # Creates set of tape alphabet
@@ -38,7 +38,7 @@ class Algorithm:
                 elif decider in chars:
                     new_char = decider
                 else:
-                    raise ValueError(f'Not a valid transition in the state') # If not a valid transition, error
+                    raise ValueError("Not a valid transition in the state") # If not a valid transition, error
             # Set new values from parsed data, then return values
             char = new_char if new_char is not None else old_char
             state = new_state if new_state is not None else old_state
@@ -48,30 +48,29 @@ class Algorithm:
         self.transition = {
             (state, char): parse(state, char, val) for state, Char_Val in function.items() for char, val in Char_Val.items()
         }
-    def create_section(self, section):
+    def tapeSection(self, section):
         return ''.join((str(self.rename.get(char, char)) for char in section))
     # Function to define how to format the output of the program
-    def create_config(self, config): # Takes in self and configuration as a tuple
+    def createConfig(self, config): # Takes in self and configuration as a tuple
         leftHead, state, (char, *rightHead) = config # Sets vars based off of configuration tuple
-        return ''.join((
+        return "".join((
             f'({state})'.ljust(self.states_max_length+5), # Display current state, then buffer of max state string length+OFFSET
-            self.create_section(leftHead), # Display left side of current head
-            colored(self.create_section((char,)), attrs=['underline']), # Underline current head position
-            self.create_section(rightHead) # Display right side of current head
+            self.tapeSection(leftHead), # Display left side of current head
+            colored(self.tapeSection((char,)), attrs=['underline']), # Underline current head position
+            self.tapeSection(rightHead) # Display right side of current head
         ))
-    ## Definition of run to execute the program
+    # Main driver of the program
     def run(self,starter,*,fstates={True: True,False: False,}, max_steps=1_000,):
-        # Below is the main driver of the code
-        tm = TuringMachine(starter, blank=self.blank, startState=self.startState)
+        tm = TuringMachine(starter, blankChar=self.blankChar, startState=self.startState)
         print("\nTuring machine configurations")
         print("=============================\n")
-        print(self.create_config(tm.config)) # Print the initial configuration
+        print(self.createConfig(tm.config)) # Print the initial configuration
         for nextCounter in itertools.count(): # Step through the turing machine until max_steps is reached
             tm.next(self.transition) # Call next transition function
-            print(self.create_config(tm.config)) # Print the configuration
+            print(self.createConfig(tm.config)) # Print the configuration
             # Check to see if we are in the final state, return the final state and tape contents and end program
             if tm.state in fstates:
                 return fstates[tm.state], tm.contents # If so, return the final state and the current tape
             # Set step count to ensure that we don't get into an infinite loop or a TM that takes way too long
             if nextCounter > max_steps:
-                raise RuntimeError(f'Error: Step limit reached')
+                raise RuntimeError("Error: Step limit reached")

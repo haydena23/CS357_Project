@@ -23,13 +23,13 @@ class TuringMachine:
         self,
         startTape=(),
         *,
-        blank='[]',
+        blankChar='[]',
         startState='q_s',
         marker=0,):
         # Sets self vars in accordance to initial vars
-        self.blank, self.state, self.marker = blank, startState, marker
+        self.blankChar, self.state, self.marker = blankChar, startState, marker
         # Creates tape by inserting blank space at the beginning, then the input string
-        self.tape = collections.defaultdict(lambda: self.blank, enumerate(startTape)) 
+        self.tape = collections.defaultdict(lambda: self.blankChar, enumerate(startTape)) 
     # Function to return the current char at head_position
     @property
     def char(self):
@@ -41,10 +41,10 @@ class TuringMachine:
     # Function to create the configuration in the form of leftHead::Head::rightHead
     @property
     def config(self):
-        indices = self.tape.keys() # Split tape into array using keys in format [0,1,2..tapeMax]
-        left, right = (min(indices), max(indices)) if indices else (0, 0) # Set the lowest and highest index of input string
+        idx = self.tape.keys() # Split tape into array using keys in format [0,1,2..tapeMax]
+        leftBound, rightBound = (min(idx), max(idx)) if idx else (0, 0) # Set the lowest and highest index of input string
         leftHead, rightHead = (
-            tuple(self.tape[index] for index in range(*r)) for r in ((left, self.marker), (self.marker, max(right, self.marker)+1))
+            tuple(self.tape[index] for index in range(*r)) for r in ((leftBound, self.marker), (self.marker, max(rightBound, self.marker)+1))
         )
         return leftHead, self.state, rightHead
     # Function to remove blanks from string, and create tape by concatenating all chars on self.tape 
@@ -55,8 +55,8 @@ class TuringMachine:
         # Function to remove any blank chars 
         def remove_nulls(listToIterate):
             return itertools.takewhile(
-                lambda char: char != self.blank, # If char == blank char, break loop and return iterable without blank chars
-                itertools.dropwhile(lambda char: char == self.blank, listToIterate) # If char == blank char, drop it and return
+                lambda char: char != self.blankChar, # If char == blank char, break loop and return iterable without blank chars
+                itertools.dropwhile(lambda char: char == self.blankChar, listToIterate) # If char == blank char, drop it and return
             )
         # Concatenate the tape iterable that now doesn't include blank chars
         return ''.join(remove_nulls(self.tape[idx] for idx in range(leftBound,rightBound+1)))
