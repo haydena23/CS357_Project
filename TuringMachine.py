@@ -62,7 +62,7 @@ class TuringMachine:
         try: # Try to move to next valid trasition
             NewChar, NewState, markerMove = transition[self.state,self.char]
         except KeyError: # If not valid, throw error
-            raise RuntimeError(f'That transition is not defined')
+            raise RuntimeError('That transition is not defined')
         self.char = NewChar
         self.state = NewState
         self.marker = markerMove(self.marker)
