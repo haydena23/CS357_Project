@@ -19,13 +19,7 @@ import collections
 
 class TuringMachine:
     # Default constructor to create initial state
-    def __init__(
-        self,
-        startTape=(),
-        *,
-        blankChar='[]',
-        startState='q_START',
-        marker=0,):
+    def __init__(self,startTape=(),*,blankChar='[]',startState='q_START',marker=0,):
         # Sets self vars in accordance to initial vars
         self.blankChar = blankChar
         self.state = startState
@@ -44,7 +38,8 @@ class TuringMachine:
     @property
     def config(self):
         idx = self.tape.keys() # Split tape into array using keys in format [0,1,2..tapeMax]
-        leftBound, rightBound = (min(idx), max(idx)) if idx else (0, 0) # Set the lowest and highest index of input string
+        leftBound = min(idx)
+        rightBound = max(idx)
         leftHead, rightHead = (
             tuple(self.tape[index] for index in range(*r)) for r in ((leftBound, self.marker), (self.marker, max(rightBound, self.marker)+1))
         )
@@ -53,7 +48,8 @@ class TuringMachine:
     @property
     def contents(self):
         idx = self.tape.keys() # Parse the index values from the tape
-        leftBound, rightBound = (min(idx), max(idx)) if idx else (0,0) # Calculate bounds of the tape
+        leftBound = min(idx) # Calculate bounds of the tape
+        rightBound = max(idx)
         # Function to remove any blank chars 
         def remove_nulls(listToIterate):
             return itertools.takewhile(
@@ -63,9 +59,9 @@ class TuringMachine:
         # Concatenate the tape iterable that now doesn't include blank chars
         return "".join(remove_nulls(self.tape[idx] for idx in range(leftBound,rightBound+1)))
     def next(self, transition):
-        try:
+        try: # Try to move to next valid trasition
             NewChar, NewState, markerMove = transition[self.state,self.char]
-        except KeyError:
+        except KeyError: # If not valid, throw error
             raise RuntimeError(f'That transition is not defined')
         self.char = NewChar
         self.state = NewState

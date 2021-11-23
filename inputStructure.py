@@ -4,17 +4,7 @@ from termcolor import colored
 ## Algorithm class defining the input file
 class inputStructure:
     # Create initial object for TM data
-    def __init__(
-        self,
-        function,
-        *,
-        blankChar='[]',
-        startState='q_START',
-        states=(True, False),
-        chars=(),
-        arrows={'<-': lambda marker: marker-1,'->': lambda marker: marker+1,},
-        rename={'[]': '$'},
-        ):
+    def __init__(self,function,*,blankChar='[]',startState='q_START',states=(True, False),chars=(),arrows={'<-': lambda marker: marker-1,'->': lambda marker: marker+1,},rename={'[]': '$'},):
         # Set init vars
         self.blankChar = blankChar
         self.startState = startState
@@ -24,23 +14,21 @@ class inputStructure:
         self.statesMaxLength = max(len(str(state)) for state in states) # Calculates the largest string of all state names as int
 
         # Function to parse information for each transition
-        def stripData(old_state, old_char, value):
-            if not isinstance(value, tuple):
-                value = (value,) # If value isn't a tuple var, set it to a tuple
-            new_char, new_state, new_arrow = None, None, None
+        def stripData(oldState, oldChar, value):
+            newChar, newState, newArrow = None, None, None
             for decider in value: # Depending on what temp var decider is, store it in respective var
                 if decider in arrows:
-                    new_arrow = decider
+                    newArrow = decider
                 elif decider in states:
-                    new_state = decider
+                    newState = decider
                 elif decider in chars:
-                    new_char = decider
+                    newChar = decider
                 else:
                     raise ValueError("Not a valid transition in the state") # If not a valid transition, error
             # Set new values from parsed data, then return values
-            char = new_char if new_char is not None else old_char
-            state = new_state if new_state is not None else old_state
-            markerMove = arrows[new_arrow] if new_arrow else lambda marker: marker
+            char = newChar if newChar is not None else oldChar
+            state = newState if newState is not None else oldState
+            markerMove = arrows[newArrow] if newArrow else lambda marker: marker
             return char, state, markerMove
         # Function to parse a single transition
         self.transition = {
