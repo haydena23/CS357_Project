@@ -1,5 +1,5 @@
 from TuringMachine import *
-from algo import *
+from inputStructure import *
 
 inputStructure({
     'q_START': {
