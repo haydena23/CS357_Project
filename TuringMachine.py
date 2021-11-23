@@ -61,7 +61,7 @@ class TuringMachine:
                 itertools.dropwhile(lambda char: char == self.blankChar, listToIterate) # If char == blank char, drop it and return
             )
         # Concatenate the tape iterable that now doesn't include blank chars
-        return ''.join(remove_nulls(self.tape[idx] for idx in range(leftBound,rightBound+1)))
+        return "".join(remove_nulls(self.tape[idx] for idx in range(leftBound,rightBound+1)))
     def next(self, transition):
         try:
             NewChar, NewState, markerMove = transition[self.state,self.char]

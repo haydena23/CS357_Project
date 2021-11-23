@@ -1,7 +1,7 @@
 from TuringMachine import *
 from algo import *
 
-Algorithm({
+inputStructure({
     'q_s': {
         '0': ('1', '->'),
         '1': ('0', '->'),

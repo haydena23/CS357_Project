@@ -1,15 +1,21 @@
 from TuringMachine import *
 from algo import *
 
-Algorithm({
-    'q_even': {
-        '0': ('q_odd', '->'),
-        '1': ('q_odd', '->'),
+inputStructure({
+    'q_START': {
+        '0': ('q_ODD', '->'),
+        '1': ('q_ODD', '->'),
+        '[]': 'q_ACCEPT',
+    },
+    'q_ODD': {
+        '0': ('q_START', '->'),
+        '1': ('q_START', '->'),
+        '[]': 'q_REJECT',
+    },
+    'q_ACCEPT': {
         '[]': True,
     },
-    'q_odd': {
-        '0': ('q_even', '->'),
-        '1': ('q_even', '->'),
+    'q_REJECT': {
         '[]': False,
-    }
-}, initial_state='q_even').run('111111000000')
+    },
+}).run('111111000000')

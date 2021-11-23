@@ -2,7 +2,7 @@ from TuringMachine import *
 from termcolor import colored
 
 ## Algorithm class defining the input file
-class Algorithm:
+class inputStructure:
     # Create initial object for TM data
     def __init__(
         self,
@@ -21,13 +21,10 @@ class Algorithm:
         self.rename = rename
         states = set(function.keys()).union(states) # Create set of all states in TM
         chars = set(char for values in function.values() for char in values.keys()).union(chars) # Creates set of tape alphabet
-        # Check all combinations of states, chars and arrows
-        for (label1, set1), (label2, set2) in itertools.combinations({'states': states, 'symbols': chars, 'arrows': arrows}.items(), 2):
-            if not set1.isdisjoint(set2):
-                raise ValueError(f'Sets of {label1} and {label2} arent disjoint')
-        self.states_max_length = max(len(str(state)) for state in states) # Calculates the largest string of all state names as int
+        self.statesMaxLength = max(len(str(state)) for state in states) # Calculates the largest string of all state names as int
+
         # Function to parse information for each transition
-        def parse(old_state, old_char, value):
+        def stripData(old_state, old_char, value):
             if not isinstance(value, tuple):
                 value = (value,) # If value isn't a tuple var, set it to a tuple
             new_char, new_state, new_arrow = None, None, None
@@ -47,7 +44,7 @@ class Algorithm:
             return char, state, markerMove
         # Function to parse a single transition
         self.transition = {
-            (state, char): parse(state, char, val) for state, Char_Val in function.items() for char, val in Char_Val.items()
+            (state, char): stripData(state, char, val) for state, Char_Val in function.items() for char, val in Char_Val.items()
         }
     def tapeSection(self, section):
         return ''.join((str(self.rename.get(char, char)) for char in section))
@@ -55,13 +52,13 @@ class Algorithm:
     def createConfig(self, config): # Takes in self and configuration as a tuple
         leftHead, state, (char, *rightHead) = config # Sets vars based off of configuration tuple
         return "".join((
-            f'({state})'.ljust(self.states_max_length+5), # Display current state, then buffer of max state string length+OFFSET
+            f'({state})'.ljust(self.statesMaxLength+5), # Display current state, then buffer of max state string length+OFFSET
             self.tapeSection(leftHead), # Display left side of current head
             colored(self.tapeSection((char,)), attrs=['underline']), # Underline current head position
             self.tapeSection(rightHead) # Display right side of current head
         ))
     # Main driver of the program
-    def run(self,starter,*,fstates={True: True,False: False,}, max_steps=1_000,):
+    def run(self,starter,*,fstates={'q_ACCEPT': True,'q_REJECT': False,}, max_steps=1_000,):
         tm = TuringMachine(starter, blankChar=self.blankChar, startState=self.startState)
         print("\nTuring machine configurations")
         print("=============================\n")
@@ -74,4 +71,4 @@ class Algorithm:
                 return fstates[tm.state], tm.contents # If so, return the final state and the current tape
             # Set step count to ensure that we don't get into an infinite loop or a TM that takes way too long
             if nextCounter > max_steps:
-                raise RuntimeError("Error: Step limit reached")
+                raise RuntimeError("Max counter reached")
