@@ -1,6 +1,6 @@
 # { 0^n 1^n | n >= 0 }
 
-from tmsim import *
+from TuringMachine import *
 from algo import *
 
 Algorithm({
