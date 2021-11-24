@@ -19,19 +19,18 @@
 from TuringMachine import *
 from inputStructure import *
 
-# This is the input file for testCase_EVEN. Given these specific states, it tests whether or not the input string is of even length.
-# If the string is of even length, it returns true. If it is not, then it returns false. This is done by evaluating the tape, and in one
-# pass through, bouncing back and forth between two states for even or odd length, much similar to a DFA.
+# This is the input file for testCase_InvertString. Given these specific states, it will rewrite the input of 1's and 0's to the
+# inverted form, for example 101 will be rewritten as 010.
 
 inputStructure({
-    'q_START': {
-        '1':('0','->'),
-        '0':('1','->'),
-        '[]':'q_ACCEPT',
+    'q_START': { # This is the starter state
+        '1':('0','->'), # Read as "If read 1, rewrite 0, move marker right"
+        '0':('1','->'), # Read as "If read 0, rewrite 1, move marker right"
+        '[]':'q_ACCEPT', # If read blank space, move to q_ACCEPT
     },
     'q_ACCEPT': { # This is the q_ACCEPT state
-        '[]': True, # If the TM makes it to this state, then the TM will accept it, ending the program stating valid string
-    },
+        '[]': True, # If the TM makes it to this state and reads the correct ending codition, 
+    },              # then the TM will accept it, ending the program stating valid string
     'q_REJECT': { # This is the q_REJECT state
         '[]': False, # If the TM makes it to this state, then the TM will reject it, ending the program stating invalid string
     },
