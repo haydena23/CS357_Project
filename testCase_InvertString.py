@@ -34,4 +34,4 @@ inputStructure({
     'q_REJECT': { # This is the q_REJECT state
         '[]': False, # If the TM makes it to this state, then the TM will reject it, ending the program stating invalid string
     },
-}).run('111000110010') # Here is our test string that we would like to run through this specific TM. The output should be 000111001101
+}).run('101') # Here is our test string that we would like to run through this specific TM. The output should be 000111001101
