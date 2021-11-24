@@ -3,13 +3,15 @@
 # Authors:
 #   Tony Hayden
 #   Jennifer Brana
+#
 # Version: 1.0
 # 11/22/21
-#
-# Notes:
-#   This program requires the termcolor module. To import this module, go to the terminal of this file
-#   and type "python -m pip install termcolor" without the "", and then restart. That should install the
-#   module. This module is being used to underline the head pointer on the tape.
+#                                               IMPORTANT 
+#############################################################################################################
+#   This program requires the termcolor module. To import this module, go to the terminal of this file      #
+#   and type "python -m pip install termcolor" without the "", and then restart. That should install the    #
+#   module. This module is being used to underline the head pointer on the tape.                            #
+#############################################################################################################
 #
 # Resources used:
 #   Introducing Python: Modern Computing in Simple Packages, 2nd Edition (Bill Lubanovic)

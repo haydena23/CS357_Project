@@ -1,3 +1,21 @@
+# Using Python 3.9
+#
+# Authors:
+#   Tony Hayden
+#   Jennifer Brana
+#
+# Version: 1.0
+# 11/22/21
+#                                               IMPORTANT 
+#############################################################################################################
+#   This program requires the termcolor module. To import this module, go to the terminal of this file      #
+#   and type "python -m pip install termcolor" without the "", and then restart. That should install the    #
+#   module. This module is being used to underline the head pointer on the tape.                            #
+#############################################################################################################
+#
+# Resources used:
+#   Introducing Python: Modern Computing in Simple Packages, 2nd Edition (Bill Lubanovic)
+
 from TuringMachine import *
 from termcolor import colored
 
@@ -15,6 +33,8 @@ class inputStructure:
 
         # Function to parse information for each transition
         def stripData(oldState, oldChar, value):
+            if not isinstance(value, tuple): # Ensures that value is of type tuple. If it is not, then it is of type boolean.
+                value = (value,) # This means for the for loop down below, it would try to iterate through a boolean, which is not possible
             newChar, newState, newArrow = None, None, None
             for decider in value: # Depending on what temp var decider is, store it in respective var
                 if decider in arrows:
@@ -47,16 +67,16 @@ class inputStructure:
         ))
     # Main driver of the program
     def run(self,starter,*,fstates={'q_ACCEPT': True,'q_REJECT': False,}, max_steps=1_000,):
-        tm = TuringMachine(starter, blankChar=self.blankChar, startState=self.startState)
+        turingMachine = TuringMachine(starter, blankChar=self.blankChar, startState=self.startState)
         print("\nTuring machine configurations")
         print("=============================\n")
-        print(self.createConfig(tm.config)) # Print the initial configuration
+        print(self.createConfig(turingMachine.config)) # Print the initial configuration
         for nextCounter in itertools.count(): # Step through the turing machine until max_steps is reached
-            tm.next(self.transition) # Call next transition function
-            print(self.createConfig(tm.config)) # Print the configuration
+            turingMachine.next(self.transition) # Call next transition function
+            print(self.createConfig(turingMachine.config)) # Print the configuration
             # Check to see if we are in the final state, return the final state and tape contents and end program
-            if tm.state in fstates:
-                return fstates[tm.state], tm.contents # If so, return the final state and the current tape
+            if turingMachine.state in fstates:
+                return fstates[turingMachine.state], turingMachine.contents # If so, return the final state and the current tape
             # Set step count to ensure that we don't get into an infinite loop or a TM that takes way too long
             if nextCounter > max_steps:
                 raise RuntimeError("Max counter reached")
