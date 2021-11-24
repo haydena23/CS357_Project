@@ -5,7 +5,7 @@
 #   Jennifer Brana
 #
 # Version: 1.0
-# 11/22/21
+# 11/23/21
 #                                               IMPORTANT 
 #############################################################################################################
 #   This program requires the termcolor module. To import this module, go to the terminal of this file      #
@@ -19,7 +19,7 @@
 from TuringMachine import *
 from termcolor import colored
 
-## Algorithm class defining the input file
+# Input class defining the input file
 class inputStructure:
     # Create initial object for TM data
     def __init__(self,function,*,blankChar='[]',startState='q_START',states=(True, False),chars=(),arrows={'<-': lambda marker: marker-1,'->': lambda marker: marker+1,},rename={'[]': '$'},):

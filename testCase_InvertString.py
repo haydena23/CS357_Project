@@ -24,20 +24,15 @@ from inputStructure import *
 # pass through, bouncing back and forth between two states for even or odd length, much similar to a DFA.
 
 inputStructure({
-    'q_START': { # This is the state q_START
-        '0': ('q_ODD', '->'), # This line says "If read input 0, move to state q_ODD, and move the marker right"
-        '1': ('q_ODD', '->'), # This line says "If read input 1, move to state q_ODD, and move the marker right"
-        '[]': 'q_ACCEPT', # If read in a blank space, then string is of even length, and move to q_ACCEPT
+    'q_START': {
+        '1':('0','->'),
+        '0':('1','->'),
+        '[]':'q_ACCEPT',
     },
-    'q_ODD': { # This is the state q_ODD
-        '0': ('q_START', '->'), # This line says "If read input 0, move to state q_START, and move the marker right"
-        '1': ('q_START', '->'), # This line says "If read input 1, move to state q_START, and move the marker right"
-        '[]': 'q_REJECT', # If read in a blank space, then string is of odd length, and move to q_REJECT
-    },
-    'q_ACCEPT': { # This is the q_ACCEPT state, and giving the satisfactory conditions for the TM, returns True saying it accepts
-        '[]': True, # For this TM, it will only move to q_ACCEPT if the TM is correct and read in a space, therefore it reads the space again
+    'q_ACCEPT': { # This is the q_ACCEPT state
+        '[]': True, # If the TM makes it to this state, then the TM will accept it, ending the program stating valid string
     },
     'q_REJECT': { # This is the q_REJECT state
-        '[]': False, # If the TM makes it to this state, then the TM will reject it, ending the program stating false
+        '[]': False, # If the TM makes it to this state, then the TM will reject it, ending the program stating invalid string
     },
-}).run('111111000000') # Here is our test string that we would like to run through this specific TM.
+}).run('111000110010') # Here is our test string that we would like to run through this specific TM. The output should be 000111001101
